@@ -1,36 +1,24 @@
-<template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+<template> <!--html코드라고 생각하면 됨-->
+  <div>
+    <h1>{{ title }}</h1>
+    <p>{{ count }}</p>
+    <button @click="count++">추가</button>
+    <HomeComponent></HomeComponent>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import request from "request"
+  import HomeComponent from './home' /*'./home.vue'라고 쓰는 것도 가능*/
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  },
-  mounted() {
-    request('http://localhost:8080/api/hello', function(error, response, body){
-        window.console.log('error:', error);
-        window.console.log('statusCode:', response && response.statusCode);
-        window.console.log('body:', body);
-    });
+  export default {
+    components:{  /*위에 import 해준 .vue 파일을 사용할 수 있게 쓰는 행위 @Autowired와같음*/
+      HomeComponent
+    },
+    data() {
+      return {
+        title:"hihi",
+        count:1
+      }
+    }
   }
-}
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
