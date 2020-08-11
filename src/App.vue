@@ -1,54 +1,61 @@
-<template> <!--html코드라고 생각하면 됨-->
-  <div> <!-- root 요소로 꼬옥 있어야 하고 root가 여러개면 에러남 -->
-    <h1>{{ title }}</h1>
-    <p>{{ count }}</p>
-    <button @click="count++">추가</button>
-    <HomeComponent></HomeComponent>
-
-    <div class="blue lighten-3 pa-3" style="padding-left:30px;">
-      <h1>User 컴포넌트</h1>
-      <p>이름 : {{ name }}</p>
-      <div class="my-2">
-        <v-btn small color="error" @click="changeName()">이름 변경</v-btn>
+<template>
+  <div>
+    <v-app>
+      <!--할 것
+      자식 component에서 변수 수정하면 부모 변수도 바뀌고 그 바뀐 것을 제3자 component에서 출력 해줌-->
+      <div class="blue lighten-3 pa-3" style="padding-left:30px;">
+        <h1>User 컴포넌트</h1>
+        <p>이름 : {{ name }}</p>
+        <div class="my-2">
+          <v-btn small color="error" @click="changeName()">이름 변경</v-btn>
+        </div>
+        <hr>
+        <v-layout row wrap>
+          <v-flex xs12 sm6>  <!--v-bind :자식이 사용할 변수명 = "전달할 데이터 변수명"-->
+            <UserDetail2 v-bind:name="name"
+                         v-bind:address='address'
+                         v-bind:phone="phone"
+                         v-bind:hasDog="hasDog"
+            ></UserDetail2>
+          </v-flex>
+          <v-flex>
+            <UserEdit2 v-bind:name="name"
+                       v-bind:address='address'
+                       v-bind:phone="phone"
+                       v-bind:hasDog="hasDog"
+                       @child="parents"
+            ></UserEdit2> <!-- 당황.. 함수라고 parents에 () 붙이면 안됨..-->
+          </v-flex>
+        </v-layout>
       </div>
-      <hr>
-      <v-layout row wrap>
-        <v-flex xs12 sm6>  <!--v-bind :자식이 사용할 변수명 = "전달할 데이터 변수명"-->
-          <UserDetail v-bind:nameOfChild="name"
-                      v-bind:numberOfChild="1"
-                      v-bind:objectOfChild="{code:1, value:'test'}">
-          </UserDetail>
-        </v-flex>
-        <v-flex>
-          <UserEdit></UserEdit>
-        </v-flex>
-      </v-layout>
-    </div>
-
+    </v-app>
   </div>
 </template>
 
 <script>
-  import HomeComponent from './home' /*'./home.vue'라고 쓰는 것도 가능*/
-  import UserEdit from "./components/UserEdit";
-  import UserDetail from "./components/UserDetail";
+  import UserEdit2 from "./components/UserEdit2";
+  import UserDetail2 from "./components/UserDetail2";
 
   export default {
-    components:{
-      UserDetail,  /*위에 import 해준 .vue 파일을 사용할 수 있게 쓰는 행위 @Autowired와같음*/
-      HomeComponent,
-      UserEdit
+    components: {
+      UserDetail2,
+      UserEdit2
     },
     data() {
       return {
-        title:"hihi",
-        count:1,
-        name:"뷰 js"
+        name: "pakker",
+        address: 'seoul',
+        phone: "010-0000-0000",
+        hasDog: true,
       }
     },
     methods:{
-      changeName() { //changeName = function () 과 동일
-        this.name="hohoho"
+      parents(user){
+        this.name= user.name;
+        this.address= user.address;
+        this.phone= user.phone;
+        this.hasDog= user.hasDog;
+        console.log('부모가 받았어!');
       }
     }
   }
