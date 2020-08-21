@@ -31,6 +31,7 @@
 
 <script>
     import {eventBus} from "../main";
+    import {dateFormat} from "../mixins/dateFormat";
     // 보통의.vue파일을 import 할떄는 이렇게 쓰는데 main.js의 eventBus는 다른가봄
     //import UserEdit2 from "./UserEdit2";
 
@@ -56,7 +57,8 @@
                 //eventBus.$emit("userWasEdited", new Date()); //eventbus를 사용하여 userWasEdited 라는 함수를 실행하는데 parameter로 Date()를 보냄
                 eventBus.userWasEdited(new Date());
             }
-        }
+        },
+        mixins:[dateFormat]
     }
 </script>
 

@@ -6,7 +6,9 @@
       <div class="blue lighten-3 pa-3" style="padding-left:30px;">
         <h1>User 컴포넌트</h1>
         <p>이름 : {{ name }}</p>
-        <div class="my-2">
+        <p>수정날짜 : {{ getDateAndTime(createAt) }}</p> <!--//mixin은 여기서 선언된 함수 마냥 function. 이런거 쓸필요 없이 바로 쓸수 있다.-->
+        <div class="my-2">  <!--if(getDateAndTime same function in here) 이안에 있는게 첫번째로 실행 그담에 minin 그담에 연결된 형제 컴포넌트에 있는 minin이 출력됨-->
+                              <!--오버 라이딩이 가능한건가.....?!-->
           <v-btn small color="error" @click="changeName()">이름 변경</v-btn>
         </div>
         <hr>
@@ -35,6 +37,7 @@
 <script>
   import UserEdit2 from "./components/UserEdit2";
   import UserDetail2 from "./components/UserDetail2";
+  import {dateFormat} from "./mixins/dateFormat";
   /*import {eventBus} from "./main"; // 참고로 안쓰는데 import해두면 에러남...........;; */
 
   export default {
@@ -48,6 +51,7 @@
         address: 'seoul',
         phone: "010-0000-0000",
         hasDog: true,
+        createAt:null
       }
     },
     methods:{
@@ -57,8 +61,11 @@
         this.phone= user.phone;
         this.hasDog= user.hasDog;
         console.log('부모가 받았어!');
-
       }
-    }
+    },
+    created() {
+      this.createAt = new Date();
+    },
+    mixins : [dateFormat]
   }
 </script>

@@ -20,7 +20,7 @@
             </v-list-item-title>
             <v-list-item-title>
                 <v-list-item-content>수정 일자:</v-list-item-content>
-                <v-list-item-content>{{editedData}}</v-list-item-content>
+                <v-list-item-content>{{ getDateAndTime(editedData) }}</v-list-item-content>
             </v-list-item-title>
         </v-list>
     </div>
@@ -28,6 +28,7 @@
 
 <script>
     import {eventBus} from "../main";
+    import {dateFormat} from "../mixins/dateFormat";
 
     export default {
         props: {
@@ -62,7 +63,8 @@
             eventBus.$on('userWasEdited', date =>{
                this.editedData = date;
             });
-        }
+        },
+        mixins:[dateFormat]
     }
 </script>
 
