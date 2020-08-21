@@ -24,8 +24,8 @@
                        v-bind:phone="phone"
                        v-bind:hasDog="hasDog"
                        @child="parents"
-            ></UserEdit2> <!-- 당황.. 함수라고 parents에 () 붙이면 안됨..-->
-          </v-flex>
+            ></UserEdit2> <!-- 당황.. 함수라고 parents 뒤에 () 붙이면 안됨..-->
+          </v-flex>       <!--child라는 신호가 왔을때 parents 라는 함수를 실행해줘! 라는 뜻임-->
         </v-layout>
       </div>
     </v-app>
@@ -35,6 +35,7 @@
 <script>
   import UserEdit2 from "./components/UserEdit2";
   import UserDetail2 from "./components/UserDetail2";
+  /*import {eventBus} from "./main"; // 참고로 안쓰는데 import해두면 에러남...........;; */
 
   export default {
     components: {
@@ -56,6 +57,7 @@
         this.phone= user.phone;
         this.hasDog= user.hasDog;
         console.log('부모가 받았어!');
+
       }
     }
   }
