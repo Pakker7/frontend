@@ -25,11 +25,15 @@
                 :value="false"
             ></v-radio>
         </v-radio-group>
-        <v-btn @click="changeData()">수정 완료</v-btn>
+        <v-btn @click="changeUser()">수정 완료</v-btn>
     </div>
 </template>
 
 <script>
+    import {eventBus} from "../main";
+    // 보통의.vue파일을 import 할떄는 이렇게 쓰는데 main.js의 eventBus는 다른가봄
+    //import UserEdit2 from "./UserEdit2";
+
     export default {
         props:['name','address','phone','hasDog'],
         data(){
@@ -44,9 +48,14 @@
             this.user.hasDog = this.hasDog
         },
         methods:{
-            changeData(){
+            /*changeData(){
                 this.$emit("child", this.user); //신호 명
-            }               //child라는 함수가 실행되는데 param을 user를 넣는거임
+            },               //child라는 함수가 실행되는데 파라미터로 user를 넣는거임*/
+            changeUser(){
+                this.$emit("child", this.user);
+                //eventBus.$emit("userWasEdited", new Date()); //eventbus를 사용하여 userWasEdited 라는 함수를 실행하는데 parameter로 Date()를 보냄
+                eventBus.userWasEdited(new Date());
+            }
         }
     }
 </script>
