@@ -15,7 +15,8 @@ const About = () => {
 }
 
 export default new Router({ // 새로운 router만들어서 하단의 객체를 전달하겠다.
-  mode: 'history',
+  mode: 'history', // 얘 주석처리하면 hash모드임
+  // hash모드는 localhost:8080/#/about 이런식으로 #뒤가 uri임
   base: process.env.BASE_URL,
   routes: [
     {
