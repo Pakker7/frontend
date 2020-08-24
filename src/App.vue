@@ -24,6 +24,27 @@
             <v-list-tile-title>About</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        전달 방법
+        1. params 객체안에 전달하면 전달됨
+        2. router.js에 속성값을 넣어서(/user/:userId)이렇게 전달 가능
+        <v-list-tile router :to="{
+          name:'user',
+          params:{
+            userId:4321,
+            name:'psk'
+          },
+          query:{
+            group:'member',
+            category:'trial'
+          }
+        }" exact><!--= a href랑 같음, ※router.js의 path가 아닌 name값임-->
+          <v-list-tile-action>  <!--@click="$router.push({path:'/about'})" 이렇게도 가능, 결론적으로 객체로 전달하는 것임!!-->
+            <i class="fas fa-user"></i>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>user</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
     </v-navigation-drawer>
     <v-toolbar color="indigo" dark fixed app>

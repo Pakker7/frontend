@@ -14,6 +14,10 @@ const About = () => {
   return import(/* webpackChunkName: "about" */ './views/About.vue');
 }
 
+const User = () =>{
+  return import(/* webpackChunkName: "about" */ './views/User.vue');
+}
+
 export default new Router({ // 새로운 router만들어서 하단의 객체를 전달하겠다.
   mode: 'history', // 얘 주석처리하면 hash모드임
   // hash모드는 localhost:8080/#/about 이런식으로 #뒤가 uri임
@@ -31,6 +35,12 @@ export default new Router({ // 새로운 router만들어서 하단의 객체를 
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited
       component: About
+    },
+    {
+      /*뒤에 어떤 값이 들어와야만 이 페이지가 동작하는거임*/
+      path : '/user/:userId', // :변수명
+      name : 'user',
+      component: User
     }
   ]
 })
