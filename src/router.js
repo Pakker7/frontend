@@ -13,10 +13,10 @@ Vue.use(Router) // router를 사용하겠다..
 const About = () => {
   return import(/* webpackChunkName: "about" */ './views/About.vue');
 }
-
 const User = () =>{
   return import(/* webpackChunkName: "about" */ './views/User.vue');
 }
+const Users = () => import(/* webpackChunkName: "users-detail" */ './views/UsersDetail.vue');
 
 export default new Router({ // 새로운 router만들어서 하단의 객체를 전달하겠다.
   mode: 'history', // 얘 주석처리하면 hash모드임
@@ -31,16 +31,26 @@ export default new Router({ // 새로운 router만들어서 하단의 객체를 
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited
       component: About
     },
     {
       /*뒤에 어떤 값이 들어와야만 이 페이지가 동작하는거임*/
-      path : '/user/:userId', // :변수명
+      path : '/user', // :변수명
       name : 'user',
-      component: User
+      // beforeEnter:(to, from, next)=>{
+      //   console.log('to: '+ to); //어디로?
+      //   console.log('from: '+ from); // 어디서?
+      //   next() // 이걸 해줘야 to로 넘어감
+      //   //next('about') 이렇게 걸어서 조건에 따른 라우터의 접근을 조절 가능
+      // },
+      component: User,
+      children:[
+        {
+          path: ":id",
+          name: "users-detail",
+          component: Users
+        }
+      ]
     }
   ]
 })
