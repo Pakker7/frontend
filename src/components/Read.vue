@@ -37,31 +37,40 @@ import axios from 'axios' //ajax 같은 통신 라이브러리
 export default {
     data () {
         return {
-            date: null,
+            date: [],
             headers: [
                 { text: 'no',   value: 'no', sortable: false ,align: 'center'},
                 { text: 'title',  value: 'title', sortable: true ,align: 'center'},
                 { text: 'writer', value: 'writer', sortable: true ,align: 'center'},
-                { text: 'date',  value: 'createDate', sortable: true ,align: 'center'},
+                { text: 'createDate',  value: 'createDate', sortable: true ,align: 'center'},
                 { text: 'action',  value: 'action', sortable: false ,align: 'center'}
             ]
         }
     },
     created () {           // 초기화 함수를 정의 한다.
-        axios.get('http://127.0.0.1:9000/api/selectList', {
-            /*params: { title: '타이틀' },*/
-            headers: {
-                'Content-Type': 'application/json' },
-            timeout: 1000
-        }).then(response => {
-            console.log(response.data);
-            this.date = response.data     // 반환되는 값을 toDoItems에 저장한다.
-        })
-        .catch(e => {
-            console.log('error : ', e)          // 에러가 나는 경우 콘솔에 에러를 출력한다
-        })
+        // this.date = [
+        //     { no : 1, title: '제목1', writer:'작성자1' ,createDate: '2020.09.01 09:35', action : 'icon'},
+        //     { no : 2, title: '제목2', writer:'작성자2' ,createDate: '2020.09.01 09:34', action : 'icon'}
+        // ]
     },
-    methods: { 
+    mounted() {
+        this.getList()
+    },
+    methods: {
+        getList() {
+            const baseURI = 'http://127.0.0.1:9000/api/selectList';
+            axios.get(baseURI, {
+                /*params: { title: '타이틀' },*/
+                headers: {
+                    'Content-Type': 'application/json' },
+                timeout: 1000
+            }).then(response => {
+                this.date = response.data.result     // 반환되는 값을 toDoItems에 저장한다.
+            })
+            .catch(e => {
+                console.log('error : ', e)          // 에러가 나는 경우 콘솔에 에러를 출력한다
+            });
+        }
     }
 }
 </script>
