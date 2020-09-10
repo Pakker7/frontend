@@ -6,7 +6,7 @@
                     <div class="text-lg-right">
                         <v-btn
                             dark class="mb-2"
-                            @click="addDialog"
+                            @click="formClearAndshowModal()"
                         >New Item</v-btn>
                     </div>
 
@@ -47,20 +47,30 @@
                             </v-card-text>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="green darken-1" flat @click="create()">확인</v-btn>
-                                <v-btn color="red darken-1" flat @click.native="dialog = false">취소</v-btn>
+                                <v-btn color="green darken-1" flat @click="isCrate ? create() : update()">Yes</v-btn>
+                                <v-btn color="red darken-1" flat @click.native="dialog = false">No</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
-                    <v-snackbar
-                            v-model="sb.act"
-                    >
-                        {{ sb.msg }}
-                        <v-btn
-                                flat
-                                @click="sb.act = false"
-                        >닫기
-                        </v-btn>
+
+                    <v-dialog v-model="deleteDialog" persistent max-width="400px">
+                        <v-card>
+                            <v-card-title class="headline">Delete</v-card-title>
+                            <v-card-text>
+                                삭제 하시겠습니까?
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="red darken-1" flat @click="deleteData()">Yes</v-btn>
+                                <v-btn color="green darken-1" flat @click.native="deleteDialog = false">No</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+
+
+                    <v-snackbar v-model="alertSnackbar.active">
+                        {{ alertSnackbar.msg }}
+                        <v-btn flat @click="alertSnackbar.active = false">닫기</v-btn>
                     </v-snackbar>
 
                 </template>
@@ -74,10 +84,10 @@
                         <td :class="headers[3].class">{{ props.item.createDate }}</td>
                         <td>
                             <div class="icon-space">
-                                <v-icon>fas fa-edit</v-icon>
+                                <v-icon @click="get(props.item.no)">fas fa-edit</v-icon>
                             </div>
                             <div class="icon-space">
-                                <v-icon>fas fa-trash-alt</v-icon>
+                                <v-icon @click="showDeleteModal(props.item.no)">fas fa-trash-alt</v-icon>
                             </div>
                         </td>
 
@@ -91,6 +101,10 @@
 //import data from '../data/index.js'
 import $axios from 'axios' //ajax 같은 통신 라이브러리
 
+//TODO script 부분이랑 분리?? vue에서 그렇게 하는지 모르겠지만 어쨌든
+//TODO :: 이거 있는거랑 없는거 차이
+//TODO 함수용으로 변수에다 넣어서 사용하려면.... this.isCrate .. 이거.....
+
 export default {
     data () {
         return {
@@ -102,30 +116,21 @@ export default {
                 { text: 'createDate',  value: 'createDate', sortable: true ,align: 'center'},
                 { text: 'action',  value: 'action', sortable: false ,align: 'center'}
             ],
-
-
-            board: {
-                name: '로딩중...',
-                rmk: '무엇?'
-            },
-            articles: [],
             dialog: false,
             form: {
+                no : 0,
                 title: '',
                 contents: '',
                 writer:''
             },
-            sb: {
-                act: false,
+            deleteDialog : false,
+            deleteNo: 0,
+            isCrate : true,
+            alertSnackbar: {
+                active: false,
                 msg: ''
             },
         }
-    },
-    created () {           // 초기화 함수를 정의 한다.
-        // this.date = [
-        //     { no : 1, title: '제목1', writer:'작성자1' ,createDate: '2020.09.01 09:35', action : 'icon'},
-        //     { no : 2, title: '제목2', writer:'작성자2' ,createDate: '2020.09.01 09:34', action : 'icon'}
-        // ]
     },
     mounted() {
         this.getList()
@@ -144,22 +149,49 @@ export default {
                 console.log('error : ', e)
             });
         },
-        addDialog () {
+
+        formClearAndshowModal () {
+            this.form.title = ""
+            this.form.contents = ""
+            this.form.writer = ""
+
             this.dialog = true
-            this.form = {
-                title: '',
-                contents: '',
-                writer: ''
-            }
+            this.isCrate = true // create 인지 여부
         },
-        hideDialog () {
+
+        hideModal () {
             this.dialog = false
         },
+
+        get (no) {
+            let that = this;
+            const baseURI = 'http://127.0.0.1:9000/api/get';
+            $axios.get(baseURI, {
+                params: { 'no' : no }
+            }).then(response => {
+
+                if (response) {
+                    that.formClearAndshowModal();
+                    that.isCrate = false;
+
+                    that.form.no = no;
+                    that.form.title = response.data.result.title
+                    that.form.contents = response.data.result.contents
+                    that.form.writer = response.data.result.writer
+                } else {
+                    that.popupAlert("데이터 불러오기를 실패하였습니다. 관리자에게 문의 하세요.");
+                }
+
+            }).catch(e => {
+                console.log('error : ', e)
+            });
+        },
         create () {
-            //validation
-            if (!this.form.title) return this.popupAlert('제목을 작성해주세요')
-            if (!this.form.contents) return this.popupAlert('내용을 작성해주세요')
-            if (!this.form.writer) return this.popupAlert('작성자를 작성해주세요')
+            console.log('create 실행');
+            //유효성 검사
+            if (!this.validation()) {
+                return;
+            }
 
             const baseURI = 'http://127.0.0.1:9000/api/create';
             $axios.post(baseURI, this.form,{
@@ -167,9 +199,10 @@ export default {
                     'Content-Type': 'application/json' }
                 }
             ).then(response => {
-                this.hideDialog();
-                this.getList();
                 if (response.data.result > 0) {
+                    this.hideModal();
+                    this.getList();
+
                     this.popupAlert("저장되었습니다");
                 } else {
                     this.popupAlert("실패하였습니다. 관리자에게 문의 하세요.");
@@ -179,9 +212,82 @@ export default {
             });
         },
 
+        update () {
+            console.log('update 실행');
+            //유효성 검사
+            if (!this.validation()) {
+                return;
+            }
+
+            const baseURI = 'http://127.0.0.1:9000/api/update';
+            $axios.post(baseURI, this.form,{
+                    headers: {
+                        'Content-Type': 'application/json' }
+                }
+            ).then(response => {
+                console.log('update 결과' + response );
+                console.log('update 결과' + response.data.result );
+                if (response.data.result > 0) {
+                    this.hideModal();
+                    this.getList();
+
+                    this.popupAlert("수정 되었습니다");
+                } else {
+                    this.popupAlert("실패하였습니다. 관리자에게 문의 하세요.");
+                }
+            }).catch(e => {
+                console.log('error : ', e)
+            });
+        },
+
+        showDeleteModal (no) {
+            this.deleteDialog = true;
+            this.form.no = no;
+        },
+
+        hideDeleteModal () {
+            this.deleteDialog = false;
+        },
+
+        deleteData (){
+            const baseURI = 'http://127.0.0.1:9000/api/delete';
+            $axios.post(baseURI, this.form,{
+                headers: { 'Content-Type': 'application/json' }
+            }).then(response => {
+                console.log('delete 결과' + response );
+                if (response.data.result > 0) {
+                    this.hideDeleteModal()
+                    this.getList();
+
+                    this.popupAlert("삭제 되었습니다");
+                } else {
+                    this.popupAlert("실패하였습니다. 관리자에게 문의 하세요.");
+                }
+            }).catch(e => {
+                console.log('error : ', e)
+            });
+        },
+
         popupAlert (msg) {
-            this.sb.act = true
-            this.sb.msg = msg
+            this.alertSnackbar.active = true
+            this.alertSnackbar.msg = msg
+        },
+
+        validation () {
+            if (!this.form.title){
+                this.popupAlert('제목을 작성해주세요');
+                return;
+            }
+            if (!this.form.contents) {
+                this.popupAlert('내용을 작성해주세요');
+                return;
+            }
+            if (!this.form.writer) {
+                return this.popupAlert('작성자를 작성해주세요');
+                return;
+            }
+
+            return true;
         }
     }
 }
