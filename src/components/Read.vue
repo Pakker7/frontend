@@ -137,7 +137,7 @@ export default {
     },
     methods: {
         getList() {
-            const baseURI = 'http://127.0.0.1:9000/api/selectList';
+            const baseURI = '/api/selectList';
             $axios.get(baseURI, {
                 /*params: { title: '타이틀' },
                 headers: {
@@ -146,7 +146,7 @@ export default {
             }).then(response => {
                 this.date = response.data.result
             }).catch(e => {
-                console.log('error : ', e)
+                console.error('error : ', e)
             });
         },
 
@@ -165,11 +165,9 @@ export default {
 
         get (no) {
             let that = this;
-            const baseURI = 'http://127.0.0.1:9000/api/get';
-            $axios.get(baseURI, {
-                params: { 'no' : no }
-            }).then(response => {
-
+            const baseURI = '/api/board/' + no;
+            $axios.get(baseURI)
+                .then(response => {
                 if (response) {
                     that.formClearAndshowModal();
                     that.isCrate = false;
@@ -183,17 +181,16 @@ export default {
                 }
 
             }).catch(e => {
-                console.log('error : ', e)
+                console.error('error : ', e)
             });
         },
         create () {
-            console.log('create 실행');
             //유효성 검사
             if (!this.validation()) {
                 return;
             }
 
-            const baseURI = 'http://127.0.0.1:9000/api/create';
+            const baseURI = '/api/save';
             $axios.post(baseURI, this.form,{
                 headers: {
                     'Content-Type': 'application/json' }
@@ -208,25 +205,22 @@ export default {
                     this.popupAlert("실패하였습니다. 관리자에게 문의 하세요.");
                 }
             }).catch(e => {
-                console.log('error : ', e)
+                console.error('error : ', e)
             });
         },
 
         update () {
-            console.log('update 실행');
             //유효성 검사
             if (!this.validation()) {
                 return;
             }
 
-            const baseURI = 'http://127.0.0.1:9000/api/update';
-            $axios.post(baseURI, this.form,{
+            const baseURI = '/api/board/' + this.form.no;
+            $axios.put(baseURI, this.form,{
                     headers: {
                         'Content-Type': 'application/json' }
                 }
             ).then(response => {
-                console.log('update 결과' + response );
-                console.log('update 결과' + response.data.result );
                 if (response.data.result > 0) {
                     this.hideModal();
                     this.getList();
@@ -236,7 +230,7 @@ export default {
                     this.popupAlert("실패하였습니다. 관리자에게 문의 하세요.");
                 }
             }).catch(e => {
-                console.log('error : ', e)
+                console.error('error : ', e)
             });
         },
 
@@ -250,22 +244,26 @@ export default {
         },
 
         deleteData (){
-            const baseURI = 'http://127.0.0.1:9000/api/delete';
-            $axios.post(baseURI, this.form,{
-                headers: { 'Content-Type': 'application/json' }
-            }).then(response => {
-                console.log('delete 결과' + response );
-                if (response.data.result > 0) {
-                    this.hideDeleteModal()
-                    this.getList();
+          let that = this;
+          const baseURI = '/api/board/' + this.form.no;
+          $axios.delete(baseURI, {
+            headers: {
+              'Content-Type': 'application/json' }
+          }).then(function (response) {
+            console.log(response.data.result);
+                if (response.data.result) {
+                  that.hideDeleteModal()
+                  that.getList();
 
-                    this.popupAlert("삭제 되었습니다");
-                } else {
-                    this.popupAlert("실패하였습니다. 관리자에게 문의 하세요.");
+                  that.popupAlert("삭제 되었습니다");
                 }
-            }).catch(e => {
-                console.log('error : ', e)
-            });
+              })
+              .catch(function (error) {
+                console.error('error : ', error)
+              })
+              .then(function () {
+                // always executed
+              });
         },
 
         popupAlert (msg) {
