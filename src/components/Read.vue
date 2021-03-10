@@ -8,6 +8,9 @@
                             dark class="mb-2"
                             @click="formClearAndshowModal()"
                         >New Item</v-btn>
+
+                      <v-btn color="green darken-1" flat @click="logout()">
+                        <v-label>{{ this.userName }}</v-label>LOG OUT</v-btn>
                     </div>
 
                     <v-dialog v-model="dialog" persistent max-width="500px">
@@ -130,6 +133,7 @@ export default {
                 active: false,
                 msg: ''
             },
+            userName : null
         }
     },
     mounted() {
@@ -286,7 +290,11 @@ export default {
             }
 
             return true;
-        }
+        },
+        logout () {
+          location.href="/logout";
+          // spring security에서 기본적으로 제공하는 로그아웃 url(안만들어도 자동으로 logout 됨, SecurityConfig에서 변경 가능)
+        },
     }
 }
 </script>

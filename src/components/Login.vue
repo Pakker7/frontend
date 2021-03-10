@@ -4,8 +4,8 @@
       <v-flex xs4 text-xs-center>
         <v-card>
           <v-card-text subheading >
-            <template v-if='options.isLoggingIn'>로그인 하세요.</template>
-            <template v-else='options.isLoggingIn'>회원가입 하세요.</template>
+            <template v-if='options.isLogin'>로그인 하세요.</template>
+<!--            <template v-else='options.isLogin'>회원가입 하세요.</template>-->
             <v-form>
 
               <v-text-field light prepend-icon='email' label='아이디'
@@ -14,7 +14,7 @@
               <v-text-field light prepend-icon='lock' label='비밀번호' type='password'
                             required
                             v-model="form.pw"></v-text-field>
-              <v-btn color="green darken-1" flat @click="login()">SIGN IN</v-btn>
+              <v-btn color="green darken-1" flat @click="login()">LOG IN</v-btn>
             </v-form>
           </v-card-text>
         </v-card>
@@ -39,8 +39,9 @@ export default{
         id: '',
         pw: ''
       },
-      options:{
-        isLoggingIn: true
+      options: {
+        isLoggingIn: false, //로그인 한 상태인지
+        isLogin : true // 로그인 or 회원가입
       },
       alertSnackbar: {
         active: false,
@@ -48,27 +49,40 @@ export default{
       },
     }
   },
+  mounted() {
+    this.loginCheck();
+  },
   methods:{
+    loginCheck() {
+      if(this.isLoggingIn) {
+        location.href="/";
+      }
+    },
+
     login() {
       //유효성 검사
       if (!this.validation()) {
         return;
       }
 
-      const baseURI = '/api/login';
-      $axios.post(baseURI, this.form,{
-            headers: {
-              'Content-Type': 'application/json' }
-          }
-      ).then(response => {
-        if (response.data.result > 0) {
-          this.popupAlert("로그인에 성공했습니다.");
-        } else {
-          this.popupAlert("없는 아이디거나 비밀번호가 틀렸습니다.");
-        }
-      }).catch(e => {
-        console.error('error : ', e)
-      });
+      // TODO 바로 연결 할 수 있게 수정 하기
+      location.href="http://localhost:9000/login/oauth2/code/google";
+
+
+      // const baseURI = '/api/login';
+      // $axios.post(baseURI, this.form,{
+      //       headers: {
+      //         'Content-Type': 'application/json' }
+      //     }
+      // ).then(response => {
+      //   if (response.data.result > 0) {
+      //     this.popupAlert("로그인에 성공했습니다.");
+      //   } else {
+      //     this.popupAlert("없는 아이디거나 비밀번호가 틀렸습니다.");
+      //   }
+      // }).catch(e => {
+      //   console.error('error : ', e)
+      // });
     },
 
     validation () {
